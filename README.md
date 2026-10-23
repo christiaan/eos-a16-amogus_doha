@@ -290,7 +290,12 @@ networks reported a wrong password.
 file makes `init.modprobe.sh` skip its "load everything" fallback, so no
 vendor module loaded. That included the aw8695 haptics driver, so the
 vibrator didn't work. The patch lists the modules explicitly: `aw8624`,
-`aw8695`, `sx933x_sar` and `stmvl53l1`.
+`aw8695`, `sx933x_sar` and `stmvl53l1`, plus the FocalTech and Novatek
+touch drivers (`focaltech_0flash_mmi`, `focaltech_0flash_mmi_doha`,
+`nova_0flash_mmi`). Some doha units have those panels instead of the
+Himax one, whose driver is built into the kernel; without them their
+touchscreen was dead. Each touch driver only binds when its panel is
+present.
 
 **Bluetooth** (`vendor/qcom/opensource/interfaces`). The prebuilt QTI
 Bluetooth HAL and FM implementation link against
