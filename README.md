@@ -31,7 +31,12 @@ patches that get that port building and booting on LineageOS 23.2.
   <source dir>` shares its files and git history instead of copying
   them. Move its `.repo/local_manifests/*.xml` out of the copy first;
   `build.sh` then syncs it to this manifest and only downloads what
-  differs.
+  differs. The sync doesn't remove the other tree's own changes, though:
+  run `repo status` and revert or remove everything except the projects
+  `build.sh` patches, and move out folders that no project in
+  `default.xml` covers (`repo list -p` lists the projects). Our first
+  build from a copied tree picked up another device's LatinIME change
+  this way.
 - **32 GB RAM plus at least 32 GB swap.** Soong's analysis step peaks around
   20 GB. With 28 GB RAM and 8 GB swap it was OOM-killed.
 - A fast internet connection. The first sync downloads about 100 GB of
