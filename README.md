@@ -26,6 +26,12 @@ patches that get that port building and booting on LineageOS 23.2.
   and `repo` first.
 - **About 350 GB of free disk**: roughly 200 GB for the synced sources and
   120 GB for `out/`. ccache adds up to 50 GB more if you enable it.
+  On btrfs (or XFS) you can save most of the source part by starting from
+  another LineageOS 23.2 checkout: `cp -a --reflink=always <that tree>
+  <source dir>` shares its files and git history instead of copying
+  them. Move its `.repo/local_manifests/*.xml` out of the copy first;
+  `build.sh` then syncs it to this manifest and only downloads what
+  differs.
 - **32 GB RAM plus at least 32 GB swap.** Soong's analysis step peaks around
   20 GB. With 28 GB RAM and 8 GB swap it was OOM-killed.
 - A fast internet connection. The first sync downloads about 100 GB of
@@ -107,6 +113,18 @@ inside `boot`.
 3. When the install finishes, recovery asks whether you want to install an
    additional zip. Choose **No**, then **Reboot system now**.
 
+To update a phone that already runs this ROM, without touching it: turn
+on USB debugging, authorize the computer, and run
+
+```sh
+adb reboot sideload-auto-reboot
+adb wait-for-sideload
+adb sideload lineage-23.2-*.zip
+```
+
+With `sideload-auto-reboot`, recovery skips the additional-zip prompt
+and reboots into the new build by itself when the install is done.
+
 Things you should know:
 
 - **Recovery installs to the inactive slot** and then switches to it. If
@@ -115,7 +133,7 @@ Things you should know:
 - During the sideload, the transfer slows down a lot at around 47%.
   Tapping the phone's screen speeds it up again.
 - `adb sideload` doesn't exit until you answer the additional-zip prompt
-  from step 3.
+  from step 3 (not with `sideload-auto-reboot`, which has no prompt).
 - When you flash `vbmeta`, the bootloader prints
   `WARNING: vbmeta_a anti rollback downgrade, 0 vs 15`. That's expected
   on an unlocked doha, and the flash still goes through.
@@ -126,6 +144,10 @@ Tested on real hardware, and working: boot, mobile calls and data (SIM),
 Wi-Fi (including WPA3-SAE), Bluetooth (HID devices and A2DP audio to a
 speaker), NFC tag reading, GPS, fingerprint (FPC), vibration, camera, audio
 and charging.
+
+Touch is tested on a unit with the Himax panel. Since 1.0.1 the
+FocalTech and Novatek touch drivers load at boot too, for units with
+those panels; they haven't been tested on such a unit yet.
 
 Not verified yet: VoLTE/IMS registration, Bluetooth headset call audio (HFP).
 
