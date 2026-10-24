@@ -154,14 +154,14 @@ Things you should know:
 
 Tested on real hardware, and working: boot, mobile calls and data (SIM),
 Wi-Fi (including WPA3-SAE), Bluetooth (HID devices and A2DP audio to a
-speaker), NFC tag reading, GPS, fingerprint (FPC), vibration, camera, audio
-and charging.
+speaker), NFC tag reading, GPS, fingerprint (FPC), vibration, camera, audio,
+charging, and VoLTE calls (4G calling, tested with a simyo SIM on KPN).
 
 Touch is tested on a unit with the Himax panel. Since 1.0.1 the
 FocalTech and Novatek touch drivers load at boot too, for units with
 those panels; they haven't been tested on such a unit yet.
 
-Not verified yet: VoLTE/IMS registration, Bluetooth headset call audio (HFP).
+Not verified yet: Bluetooth headset call audio (HFP).
 
 ---
 
