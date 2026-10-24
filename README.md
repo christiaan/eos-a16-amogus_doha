@@ -12,9 +12,16 @@ The repo has three parts:
 | `patches/` | Our fixes. `patches/<project path>.patch` applies to that project |
 | `build.sh` | Syncs the sources, applies the patches and builds the zip |
 
-The device tree, kernel and vendor blobs come from the community doha
-port by Aldair402 and moto-common. We didn't write those. Our work is the
+The device tree and vendor blobs come from the community doha port by
+Aldair402 and moto-common. We didn't write those. Our work is the
 patches that get that port building and booting on LineageOS 23.2.
+
+The kernel is our fork of Aldair402's
+([`christiaan/android_kernel_motorola_msm-4.14`](https://github.com/christiaan/android_kernel_motorola_msm-4.14),
+branch `lts`). Aldair402's kernel is Motorola's 4.14.190. Ours merges the
+4.14 LTS updates up to 4.14.357 (OpenELA) on top of it, so it carries
+several years of upstream security and stability fixes. `uname -r` shows
+`4.14.357-openela+`.
 
 ## Requirements
 
