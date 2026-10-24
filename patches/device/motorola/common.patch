@@ -41,8 +41,18 @@ index 4af13b7..7fe2a12 100644
  
  function set_permissions() {
      if [ "$fps_id" == "chipone" ]
+diff --git a/sepolicy/vendor/hwservice_contexts b/sepolicy/vendor/hwservice_contexts
+index afd4517..fc881cd 100644
+--- a/sepolicy/vendor/hwservice_contexts
++++ b/sepolicy/vendor/hwservice_contexts
+@@ -1,2 +1,5 @@
+ vendor.egistec.hardware.fingerprint::IBiometricsFingerprintRbs u:object_r:hal_fingerprint_hwservice:s0
+ vendor.focaltech.fingerprint::IFocalFingerprintService u:object_r:hal_fingerprint_hwservice:s0
++vendor.egistec.hardware.fingerprint::IBiometricsFingerprintEts u:object_r:hal_fingerprint_hwservice:s0
++com.motorola.hardware.biometric.fingerprint::IMotoFingerPrint u:object_r:hal_fingerprint_hwservice:s0
++com.motorola.hardware.biometric.fingerprint::IMotoFingerPrintSensorTest u:object_r:hal_fingerprint_hwservice:s0
 diff --git a/vintf/manifest-qcom.xml b/vintf/manifest-qcom.xml
-index fbb2b3c..177abc3 100644
+index fbb2b3c..6dc01b1 100644
 --- a/vintf/manifest-qcom.xml
 +++ b/vintf/manifest-qcom.xml
 @@ -232,15 +232,9 @@

@@ -346,6 +346,18 @@ floods the log with about 785 `getService` retries per second. The patch
 adds a fallback to the factory descriptor `/proc/hw/fps_id/ascii`
 (`fpc`), which is used only when nothing else supplied an ID.
 
+**Fingerprint, Egistec units** (`device/motorola/common`,
+`sepolicy/vendor/hwservice_contexts`). Some G8 Plus units have an
+Egistec ET5xx sensor instead of FPC. Their HAL also registers
+`vendor.egistec.hardware.fingerprint@2.0::IBiometricsFingerprintEts` and
+`com.motorola.hardware.biometric.fingerprint@1.0::IMotoFingerPrintSensorTest`.
+Neither interface had a label, so SELinux denied both registrations. The
+HAL ignores those failures and still registers the standard
+`IBiometricsFingerprint`, but the Egistec and Moto extensions were lost.
+The patch labels them `hal_fingerprint_hwservice`, like the FPC
+extensions already are. This is untested: our test unit has an FPC
+sensor.
+
 **NFC** (`hardware/nxp/nfc`). doha has a PN553 on `nq-nci`. After about
 2 seconds idle, the chip goes into standby and NACKs the first I2C write.
 The snxxx HAL retried 6 times with no delay, so every retry landed in the
