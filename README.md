@@ -362,6 +362,14 @@ app restarted every 15 seconds waiting for it. The patch stops installing
 the HAL, its libraries and the app, and removes its VINTF entry. GPS and
 XTRA downloads work without it.
 
+**Hotspot and USB tethering** (`bionic`). netd uses `posix_spawn()` with
+`POSIX_SPAWN_CLOEXEC_DEFAULT` to start dnsmasq. Since bionic commit
+`bf8fc35b7`, that flag relies on the `close_range()` syscall. doha's 4.14
+kernel doesn't have `close_range()`, so the child process exited with
+code 127 before dnsmasq ran, and tethering stopped with
+`Failed to send update command to dnsmasq (Broken pipe)`. The patch
+reverts that commit, which brings back the `fcntl()` fallback.
+
 ### Inherited from docker-lineage-cicd
 
 **`system/core`: `0001-Pass-SafetyNet.patch`.** This is not our patch. The
