@@ -306,17 +306,20 @@ requires kernel 4.19 or newer for BPF networking. doha has 4.14.
 
 ### Workarounds for the 4.14 kernel
 
-Android 16 assumes a 5.10 or newer kernel. These patches put back
-fallbacks for kernel features doha's 4.14 kernel doesn't have. The BPF
-kernel-version gates under "Needed to boot" are the same kind of fix.
+Android 16 assumes a 5.10 or newer kernel. The BPF kernel-version gates
+under "Needed to boot" put back fallbacks for kernel features doha's
+4.14 kernel doesn't have.
 
-**Hotspot and USB tethering** (`bionic`). netd uses `posix_spawn()` with
-`POSIX_SPAWN_CLOEXEC_DEFAULT` to start dnsmasq. Since bionic commit
-`bf8fc35b7`, that flag relies on the `close_range()` syscall. doha's 4.14
-kernel doesn't have `close_range()`, so the child process exited with
-code 127 before dnsmasq ran, and tethering stopped with
-`Failed to send update command to dnsmasq (Broken pipe)`. The patch
-reverts that commit, which brings back the `fcntl()` fallback. clatd
+**Hotspot and USB tethering** needed no patch here since our kernel
+gained `close_range()`. netd uses `posix_spawn()` with
+`POSIX_SPAWN_CLOEXEC_DEFAULT` to start dnsmasq, and since bionic commit
+`bf8fc35b7` that flag relies on the `close_range()` syscall. Without it
+the child process exited with code 127 before dnsmasq ran, and
+tethering stopped with
+`Failed to send update command to dnsmasq (Broken pipe)`. Earlier
+releases reverted that bionic commit. Our kernel fork now backports
+`close_range()` with `CLOSE_RANGE_CLOEXEC` from Linux 5.15, so bionic is
+unpatched again and every other caller of the syscall works too. clatd
 (464XLAT on IPv6-only mobile networks) is started the same way.
 
 ### Hardware fixes
