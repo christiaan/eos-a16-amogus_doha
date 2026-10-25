@@ -155,13 +155,16 @@ Things you should know:
 Tested on real hardware, and working: boot, mobile calls and data (SIM),
 Wi-Fi (including WPA3-SAE), Bluetooth (HID devices and A2DP audio to a
 speaker), NFC tag reading, GPS, fingerprint (FPC), vibration, camera, audio,
-charging, and VoLTE calls (4G calling, tested with a simyo SIM on KPN).
+charging, VoLTE calls (4G calling, tested with a simyo SIM on KPN), and
+starting the Wi-Fi hotspot and USB tethering.
 
 Touch is tested on a unit with the Himax panel. Since 1.0.1 the
 FocalTech and Novatek touch drivers load at boot too, for units with
 those panels; they haven't been tested on such a unit yet.
 
-Not verified yet: Bluetooth headset call audio (HFP).
+Not verified yet: Bluetooth headset call audio (HFP); traffic from a
+tethered device through mobile data (hotspot and USB tethering were tested
+with mobile data off); 464XLAT on IPv6-only mobile networks.
 
 ---
 
@@ -301,6 +304,21 @@ requires kernel 4.19 or newer for BPF networking. doha has 4.14.
   fix the problem. It's harmless, and we kept it because the tested build
   included it.
 
+### Workarounds for the 4.14 kernel
+
+Android 16 assumes a 5.10 or newer kernel. These patches put back
+fallbacks for kernel features doha's 4.14 kernel doesn't have. The BPF
+kernel-version gates under "Needed to boot" are the same kind of fix.
+
+**Hotspot and USB tethering** (`bionic`). netd uses `posix_spawn()` with
+`POSIX_SPAWN_CLOEXEC_DEFAULT` to start dnsmasq. Since bionic commit
+`bf8fc35b7`, that flag relies on the `close_range()` syscall. doha's 4.14
+kernel doesn't have `close_range()`, so the child process exited with
+code 127 before dnsmasq ran, and tethering stopped with
+`Failed to send update command to dnsmasq (Broken pipe)`. The patch
+reverts that commit, which brings back the `fcntl()` fallback. clatd
+(464XLAT on IPv6-only mobile networks) is started the same way.
+
 ### Hardware fixes
 
 **Mobile network / SIM** (`vendor/motorola/amogus`, `device/motorola/amogus`).
@@ -361,14 +379,6 @@ link against LineageOS 23.2's protobuf 25.8. It crash-looped, and the QCC
 app restarted every 15 seconds waiting for it. The patch stops installing
 the HAL, its libraries and the app, and removes its VINTF entry. GPS and
 XTRA downloads work without it.
-
-**Hotspot and USB tethering** (`bionic`). netd uses `posix_spawn()` with
-`POSIX_SPAWN_CLOEXEC_DEFAULT` to start dnsmasq. Since bionic commit
-`bf8fc35b7`, that flag relies on the `close_range()` syscall. doha's 4.14
-kernel doesn't have `close_range()`, so the child process exited with
-code 127 before dnsmasq ran, and tethering stopped with
-`Failed to send update command to dnsmasq (Broken pipe)`. The patch
-reverts that commit, which brings back the `fcntl()` fallback.
 
 ### Inherited from docker-lineage-cicd
 
