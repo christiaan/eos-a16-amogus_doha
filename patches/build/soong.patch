@@ -1,0 +1,70 @@
+From: kellyhung (AOSP 8461cd8585572d50612087a1bac6839d8179eb7e), backported
+Subject: [PATCH] Add a module type prebuilt_lib, use it for PRODUCT_COPY_FILES into lib/
+
+LineageOS 23.0's soong turns PRODUCT_COPY_FILES into generated prebuilt
+modules and uses PrebuiltRenderScriptBitcodeFactory for both lib/ and
+lib64/. That factory installs into lib64 for the arm64 variant, so every
+32-bit blob that amogus-vendor.mk copies into system_ext/lib lands in
+system_ext/lib64 too and collides with its 64-bit twin ("packaging
+conflict at system_ext/lib64/..." x126). AOSP added prebuilt_lib in
+8461cd858 and LineageOS 23.2's fsgen maps lib/ to it; this backports
+both, which is what the 23.2 build already uses.
+
+diff --git a/android/neverallow.go b/android/neverallow.go
+index 98b443ee4..530759052 100644
+--- a/android/neverallow.go
++++ b/android/neverallow.go
+@@ -253,6 +253,7 @@ func createInstallInRootAllowingRules() []Rule {
+ 			NotModuleType("prebuilt_first_stage_ramdisk").
+ 			NotModuleType("prebuilt_res").
+ 			NotModuleType("prebuilt_any").
++			NotModuleType("prebuilt_lib").
+ 			Because("install_in_root is only for init_first_stage or librecovery_ui_ext."),
+ 	}
+ }
+diff --git a/etc/prebuilt_etc.go b/etc/prebuilt_etc.go
+index 7820047ab..fc5bc30aa 100644
+--- a/etc/prebuilt_etc.go
++++ b/etc/prebuilt_etc.go
+@@ -92,6 +92,7 @@ func RegisterPrebuiltEtcBuildComponents(ctx android.RegistrationContext) {
+ 	ctx.RegisterModuleType("prebuilt_system", PrebuiltSystemFactory)
+ 	ctx.RegisterModuleType("prebuilt_first_stage_ramdisk", PrebuiltFirstStageRamdiskFactory)
+ 	ctx.RegisterModuleType("prebuilt_any", PrebuiltAnyFactory)
++	ctx.RegisterModuleType("prebuilt_lib", PrebuiltLibFactory)
+ 
+ 	ctx.RegisterModuleType("prebuilt_defaults", defaultsFactory)
+ 
+@@ -862,6 +863,20 @@ func PrebuiltFirmwareFactory() android.Module {
+ 	return module
+ }
+ 
++// prebuilt_lib installs a prebuilt file to <partition>/lib directory for system
++// image.
++// If soc_specific property is set to true, the prebuilt file is installed to the
++// vendor <partition>/lib directory for vendor image.
++func PrebuiltLibFactory() android.Module {
++	module := &PrebuiltEtc{}
++	module.socInstallDirBase = "lib"
++	InitPrebuiltEtcModule(module, "lib")
++	// This module is device-only
++	android.InitAndroidArchModule(module, android.DeviceSupported, android.MultilibFirst)
++	android.InitDefaultableModule(module)
++	return module
++}
++
+ // prebuilt_gpu is for a prebuilt artifact in <partition>/gpu directory.
+ func PrebuiltGPUFactory() android.Module {
+ 	module := &PrebuiltEtc{}
+diff --git a/fsgen/prebuilt_etc_modules_gen.go b/fsgen/prebuilt_etc_modules_gen.go
+index c0f114caf..908f77c4b 100644
+--- a/fsgen/prebuilt_etc_modules_gen.go
++++ b/fsgen/prebuilt_etc_modules_gen.go
+@@ -202,7 +202,7 @@ var (
+ 		"first_stage_ramdisk": etc.PrebuiltFirstStageRamdiskFactory,
+ 		"fonts":               etc.PrebuiltFontFactory,
+ 		"framework":           etc.PrebuiltFrameworkFactory,
+-		"lib":                 etc.PrebuiltRenderScriptBitcodeFactory,
++		"lib":                 etc.PrebuiltLibFactory,
+ 		"lib64":               etc.PrebuiltRenderScriptBitcodeFactory,
+ 		"lib/rfsa":            etc.PrebuiltRFSAFactory,
+ 		"media":               etc.PrebuiltMediaFactory,
