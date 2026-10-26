@@ -171,12 +171,11 @@ set -eu
 product=$SRC/out/target/product/$DEVICE
 images=$product/obj/PACKAGING/target_files_intermediates/lineage_$DEVICE-target_files/IMAGES
 dest=${ZIP_DIR:-$(dirname "$SRC")/zips}
-# bacon names /e/OS builds lineage-*.zip too. Name the copies e-*, like /e/'s
-# own builds, so they can't be mistaken for LineageOS builds in the same dir.
+# /e/'s vendor/lineage names the zip e-<version>.zip instead.
 name=lineage-$version
 [ -d vendor/eos ] && name=e-$version
 mkdir -p "$dest"
-cp "$product/lineage-$version.zip" "$dest/$name.zip"
+cp "$product/$name.zip" "$dest/$name.zip"
 for img in boot dtbo vbmeta; do
   cp "$images/$img.img" "$dest/$name-$img.img"
 done
