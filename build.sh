@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Sync the pinned LineageOS 23.2 sources for amogus_doha (Moto G8 Plus),
-# apply the fixes in patches/ and build the flashable zip.
+# Sync the pinned sources for amogus_doha (Moto G8 Plus), apply the fixes in
+# patches/ and build the flashable zip. Branch main builds LineageOS 23.2;
+# branch eos-a16 builds /e/OS (v4.4-a16, on LineageOS 23.0).
 #
 # Usage: ./build.sh [SOURCE_DIR]      (default: ./lineage)
 #
@@ -170,9 +171,12 @@ set -eu
 product=$SRC/out/target/product/$DEVICE
 images=$product/obj/PACKAGING/target_files_intermediates/lineage_$DEVICE-target_files/IMAGES
 dest=${ZIP_DIR:-$(dirname "$SRC")/zips}
+# bacon names /e/OS builds lineage-*.zip too. Name the copies e-*, like /e/'s
+# own builds, so they can't be mistaken for LineageOS builds in the same dir.
 name=lineage-$version
+[ -d vendor/eos ] && name=e-$version
 mkdir -p "$dest"
-cp "$product/$name.zip" "$dest/$name.zip"
+cp "$product/lineage-$version.zip" "$dest/$name.zip"
 for img in boot dtbo vbmeta; do
   cp "$images/$img.img" "$dest/$name-$img.img"
 done

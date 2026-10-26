@@ -1,60 +1,58 @@
 diff --git a/bpf/loader/NetBpfLoad.cpp b/bpf/loader/NetBpfLoad.cpp
-index 238864798b..af0a4af8ca 100644
 --- a/bpf/loader/NetBpfLoad.cpp
 +++ b/bpf/loader/NetBpfLoad.cpp
-@@ -1606,29 +1606,30 @@ static int doLoad(char** argv, char * const envp[]) {
+@@ -1695,29 +1695,30 @@ static int doLoad(char** argv, char * co
+     logTetheringApexVersion();
  
      // both S and T require kernel 4.9 (and eBpf support)
-     // (this also guarantees 'kernelVer' isn't an invalid uninitialized 0)
 +    // doha (amogus_doha): relaxed to non-fatal, matching the already-non-fatal
-+    // 25Q4/5.10 gate below.
++    // LTS/sublevel checks below.
 +    // Carried-forward Motorola 4.14 kernel trips the 4.19 gate below and
 +    // reboot_on_failure in netbpfload.rc turned that into an unconditional
 +    // bootloop; same precedent as LineageOS's own abandoned Gerrit 433516.
-     if (!isAtLeastKernelVersion(4, 9)) {
+     if (!isAtLeastKernelVersion(4, 9, 0)) {
 -        ALOGE("Android S & T require kernel 4.9.");
--        return 3;
+-        return 1;
 +        ALOGW("Android S & T require kernel 4.9.");
      }
  
      // U bumps the kernel requirement up to 4.14
-     if (isAtLeastU && !isAtLeastKernelVersion(4, 14)) {
+     if (isAtLeastU && !isAtLeastKernelVersion(4, 14, 0)) {
 -        ALOGE("Android U requires kernel 4.14.");
--        return 4;
+-        return 1;
 +        ALOGW("Android U requires kernel 4.14.");
      }
  
      // V bumps the kernel requirement up to 4.19
      // see also: //system/netd/tests/kernel_test.cpp TestKernel419
-     if (isAtLeastV && !isAtLeastKernelVersion(4, 19)) {
+     if (isAtLeastV && !isAtLeastKernelVersion(4, 19, 0)) {
 -        ALOGE("Android V requires kernel 4.19.");
--        return 5;
+-        return 1;
 +        ALOGW("Android V requires kernel 4.19.");
      }
  
      // 25Q2 bumps the kernel requirement up to 5.4
      // see also: //system/netd/tests/kernel_test.cpp TestKernel54
-     if (isAtLeast25Q2 && !isAtLeastKernelVersion(5, 4)) {
+     if (isAtLeast25Q2 && !isAtLeastKernelVersion(5, 4, 0)) {
 -        ALOGE("Android 25Q2 requires kernel 5.4.");
--        return 6;
+-        return 1;
 +        ALOGW("Android 25Q2 requires kernel 5.4.");
      }
  
-     // 25Q4 bumps the kernel requirement up to 5.10
+     // Technically already required by U, but only enforce on V+
 diff --git a/bpf/netd/BpfHandler.cpp b/bpf/netd/BpfHandler.cpp
-index 7367ec5e97..3884290fa3 100644
 --- a/bpf/netd/BpfHandler.cpp
 +++ b/bpf/netd/BpfHandler.cpp
-@@ -98,12 +98,12 @@ static Status initPrograms(const char* cg2_path) {
+@@ -98,12 +98,12 @@ static Status initPrograms(const char* c
  
      // V bumps the kernel requirement up to 4.19
-     if (isAtLeastV && !isAtLeastKernelVersion(4, 19)) {
+     if (isAtLeastV && !isAtLeastKernelVersion(4, 19, 0)) {
 -        return Status("V+ platform with kernel version < 4.19.0 is unsupported");
 +        ALOGW("V+ platform with kernel version < 4.19.0 is unsupported");
      }
  
      // 25Q2 bumps the kernel requirement up to 5.4
-     if (isAtLeast25Q2 && !isAtLeastKernelVersion(5, 4)) {
+     if (isAtLeast25Q2 && !isAtLeastKernelVersion(5, 4, 0)) {
 -        return Status("25Q2+ platform with kernel version < 5.4.0 is unsupported");
 +        ALOGW("25Q2+ platform with kernel version < 5.4.0 is unsupported");
      }
