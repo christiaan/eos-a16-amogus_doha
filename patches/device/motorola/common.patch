@@ -10,18 +10,6 @@ index 2422560..b943ce7 100644
      qti-telephony-hidl-wrapper \
      qti-telephony-hidl-wrapper-prd \
      qti_telephony_hidl_wrapper.xml \
-diff --git a/power-libperfmgr/Android.bp b/power-libperfmgr/Android.bp
-index c296fe1..b3a09d2 100644
---- a/power-libperfmgr/Android.bp
-+++ b/power-libperfmgr/Android.bp
-@@ -63,6 +63,7 @@ cc_binary {
-     static_libs: [
-         "libgmock",
-         "libgtest",
-+        "powerhal_flags-aconfig-cc",
-     ],
-     srcs: [
-         "aidl/BackgroundWorker.cpp",
 diff --git a/rootdir/vendor/bin/init.oem.fingerprint2.sh b/rootdir/vendor/bin/init.oem.fingerprint2.sh
 index 4af13b7..7fe2a12 100644
 --- a/rootdir/vendor/bin/init.oem.fingerprint2.sh
