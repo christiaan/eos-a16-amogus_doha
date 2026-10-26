@@ -1,3 +1,15 @@
+diff --git a/common-packages.mk b/common-packages.mk
+index 1be40ac..fc46db6 100644
+--- a/common-packages.mk
++++ b/common-packages.mk
+@@ -123,7 +123,6 @@ ifeq ($(call device-has-characteristic,nfc),true)
+   PRODUCT_PACKAGES += \
+       com.android.nfc_extras \
+       libchrome.vendor \
+-      NfcNci \
+       SecureElement \
+       Tag
+ endif
 diff --git a/hardware/qcom/product.mk b/hardware/qcom/product.mk
 index 2422560..b943ce7 100644
 --- a/hardware/qcom/product.mk
