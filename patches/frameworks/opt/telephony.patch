@@ -1,0 +1,49 @@
+From: sandeepjs (AOSP 44e3dbf3d30e89e693f2573500cb80b68fb39492), backported
+Subject: [PATCH] Update the condition to adjust the numPhysicalSlots
+
+On LineageOS 23.0 com.android.phone crash-loops on doha in dual-SIM
+(dsds) mode with "ArrayIndexOutOfBoundsException: length=1; index=1" in
+UiccController.onGetIccCardStatusDone, and the phone reports no SIM.
+UiccController sizes mUiccSlots from config_num_physical_slots (1) while
+the radio reports two slots. AOSP raises the slot count to the number of
+radio interfaces for devices that launched at or before
+VENDOR_API_2024_Q2 (doha: ro.vendor.api_level=29); LineageOS 23.2
+already has this. Single-SIM variants have one radio interface, so
+nothing changes for them. Backported without the test changes; 23.0
+logs through logWithLocalLog instead of logl.
+
+diff --git a/src/java/com/android/internal/telephony/uicc/UiccController.java b/src/java/com/android/internal/telephony/uicc/UiccController.java
+index c242a1b29d..cdae47b22a 100644
+--- a/src/java/com/android/internal/telephony/uicc/UiccController.java
++++ b/src/java/com/android/internal/telephony/uicc/UiccController.java
+@@ -37,6 +37,7 @@ import android.os.Build;
+ import android.os.Handler;
+ import android.os.Message;
+ import android.os.RegistrantList;
++import android.os.SystemProperties;
+ import android.os.UserHandle;
+ import android.preference.PreferenceManager;
+ import android.sysprop.TelephonyProperties;
+@@ -279,6 +280,22 @@ public class UiccController extends Handler {
+             logWithLocalLog("config_num_physical_slots = " + numPhysicalSlots);
+         }
+ 
++        int mVendorApiLevel = SystemProperties.getInt(
++                "ro.vendor.api_level", Build.VERSION.DEVICE_INITIAL_SDK_INT);
++        logWithLocalLog("current vendor api_level: " + mVendorApiLevel);
++        // Adjust numPhysicalSlots only for devices that were originally launched with a version
++        // of Android older than or equals to VENDOR_API_2024_Q2. This is to avoid impacting vendor
++        // freeze targets.
++        if (mVendorApiLevel <= Build.VENDOR_API_2024_Q2) {
++            logWithLocalLog("Adjusting numPhysicalSlots for firstApiLevel = " + mVendorApiLevel
++                    + " based on mCis.length");
++            // Minimum number of physical slot count should be equals to or greater than
++            // phone count,if it is less than phone count use phone count as physical slot count.
++            if (numPhysicalSlots < mCis.length) {
++                numPhysicalSlots = mCis.length;
++            }
++        }
++
+         mTelephonyManager = mContext.getSystemService(TelephonyManager.class);
+ 
+         mUiccSlots = new UiccSlot[numPhysicalSlots];
