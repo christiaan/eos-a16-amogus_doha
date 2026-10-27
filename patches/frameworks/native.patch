@@ -1,0 +1,30 @@
+From: Luca Stefani (LineageOS d8d35412206737bb3c84e157b5bd82609a835117)
+Subject: [PATCH] gpuwork: Don't abort in case map doesn't exist
+
+On /e/ v4.4-a16 (LineageOS 23.0) gpuservice aborts 30 seconds after
+every start, so it crash-loops for as long as the phone runs. doha's
+4.14 kernel doesn't get the gpuWork BPF maps, and 23.0's
+GpuWork::initialize opens them with the BpfMap(path) constructor, which
+aborts when the path is missing. LineageOS 23.2 already has this fix:
+BpfMap::init() returns an error instead, and gpuwork then just stays
+off. Applies unchanged to 23.0.
+
+diff --git a/services/gpuservice/gpuwork/GpuWork.cpp b/services/gpuservice/gpuwork/GpuWork.cpp
+index 4ad758a974..ccd5f3690e 100644
+--- a/services/gpuservice/gpuwork/GpuWork.cpp
++++ b/services/gpuservice/gpuwork/GpuWork.cpp
+@@ -67,12 +67,11 @@ bool equalGpuIdUid(const android::gpuwork::GpuIdUid& l, const android::gpuwork::
+ template <class Key, class Value>
+ bool getBpfMap(const char* mapPath, bpf::BpfMap<Key, Value>* out) {
+     errno = 0;
+-    auto map = bpf::BpfMap<Key, Value>(mapPath);
+-    if (!map.isValid()) {
++    auto result = out->init(mapPath);
++    if (!result.ok()) {
+         ALOGW("Failed to create bpf map from %s [%d(%s)]", mapPath, errno, strerror(errno));
+         return false;
+     }
+-    *out = std::move(map);
+     return true;
+ }
+ 
