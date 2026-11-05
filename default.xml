@@ -255,7 +255,7 @@
   <project name="android_vendor_motorola_amogus" path="vendor/motorola/amogus" remote="aldair402" revision="85187ccfe24f696f8ccfc68f2f03529fc0caa98f" upstream="15" dest-branch="15" groups="local::doha"/>
   <project name="android_vendor_motorola_amogus_doha" path="vendor/motorola/amogus_doha" remote="aldair402" revision="7b6d8adfee61b37bea3f08715d89936dd74d6849" upstream="14" dest-branch="14" groups="local::doha"/>
   <project name="android_vendor_motorola_common" path="vendor/motorola/common" remote="moto-common" revision="5cfff4dfe2e257fd1c9df4176ffd1bbf3bd99f20" upstream="14" dest-branch="14" groups="local::doha"/>
-  <project name="christiaan/android_kernel_motorola_msm-4.14" path="kernel/motorola/msm-4.14" revision="97b493156687ce324bde2a0d73d9df90e1466249" upstream="lts" dest-branch="lts" groups="local::doha"/>
+  <project name="christiaan/android_kernel_motorola_msm-4.14" path="kernel/motorola/msm-4.14" revision="52885f01cd5cc3b392c81bfbd3f4456a7ac8d990" upstream="lts" dest-branch="lts" groups="local::doha"/>
   <project name="device/common" remote="aosp" revision="ae6921651e468bad7be7b1c8ad7bfd3a9caceb30" upstream="refs/tags/android-16.0.0_r1" dest-branch="refs/tags/android-16.0.0_r1" groups="pdk,pdk-cw-fs"/>
   <project name="device/generic/arm64" remote="aosp" revision="71380158d818de918338e34a9cb72316fe3cfa4e" upstream="refs/tags/android-16.0.0_r1" dest-branch="refs/tags/android-16.0.0_r1" groups="pdk"/>
   <project name="device/generic/armv7-a-neon" remote="aosp" revision="5be6c1b1d84a1f046329176d5da3368cb6547703" upstream="refs/tags/android-16.0.0_r1" dest-branch="refs/tags/android-16.0.0_r1" groups="pdk"/>
