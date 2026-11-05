@@ -127,10 +127,6 @@ Known issues:
   (`403 Not allowed`). Other unofficial /e/ builds report the same.
 - Supervised (Family Link) Google accounts don't work with microG.
 - The /e/ Updater finds no updates; new builds are posted as releases here.
-- The main camera sometimes hangs when it's closed and reopened quickly,
-  for example when switching between photo and video fast. The preview
-  goes black, an error appears, and the camera app closes; opening it
-  again works. Probably also in earlier builds; not fixed yet.
 - The ultra-wide is mounted turned 90°, Motorola's "action cam": it
   films landscape while you hold the phone upright. /e/ Camera (like
   upstream Open Camera) sometimes gives its preview the wrong shape; the
