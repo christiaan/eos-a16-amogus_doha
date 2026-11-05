@@ -16,8 +16,10 @@ moto-common (device and vendor trees, blobs), and our 4.14.357 LTS kernel
 branch `lts`). What differs is the base: /e/'s `v4.4-a16` branch, which
 is LineageOS 23.0 (AOSP `android-16.0.0_r1`) with /e/'s changes and
 their own monthly security merges. Their apps come with it: microG,
-App Lounge, Advanced Privacy, Bliss Launcher, Open Camera, the /e/
-Updater, /e/'s backup apps, plus Seedvault.
+App Lounge, Advanced Privacy, Bliss Launcher, /e/ Camera, the /e/
+Updater, /e/'s backup apps, plus Seedvault. This build also ships
+LineageOS's camera app, Aperture, which handles the ultra-wide camera
+better than /e/ Camera does.
 
 | Path | What it is |
 | --- | --- |
@@ -111,8 +113,8 @@ screen speeds it up), and flashing `vbmeta` prints a harmless
 ## Status
 
 Tested on a Himax/FPC unit (XT2019-1): boot, SIM and LTE, calls, Wi-Fi,
-touch, both cameras, speaker, vibration and reboot, with SELinux
-enforcing. microG's self-check passes, including signature spoofing.
+touch, the main, front and ultra-wide cameras (photo and video),
+speaker, vibration and reboot, with SELinux enforcing. microG's self-check passes, including signature spoofing.
 App Lounge, Advanced Privacy and the Updater open. Apps install through
 Aurora Store.
 
@@ -125,13 +127,36 @@ Known issues:
   (`403 Not allowed`). Other unofficial /e/ builds report the same.
 - Supervised (Family Link) Google accounts don't work with microG.
 - The /e/ Updater finds no updates; new builds are posted as releases here.
+- The main camera sometimes hangs when it's closed and reopened quickly,
+  for example when switching between photo and video fast. The preview
+  goes black, an error appears, and the camera app closes; opening it
+  again works. Probably also in earlier builds; not fixed yet.
+- The ultra-wide is mounted turned 90°, Motorola's "action cam": it
+  films landscape while you hold the phone upright. /e/ Camera (like
+  upstream Open Camera) sometimes gives its preview the wrong shape; the
+  saved photos and videos are fine. Aperture shows it correctly.
 
 ## The patches
 
 Most patches are the same as in the LineageOS repo, and its README
 explains each one. These differ.
 
-Only in this repo, backports of fixes that LineageOS 23.2 already has:
+The ultra-wide camera fixes are also in the LineageOS repo's branch,
+but not yet in a LineageOS release:
+
+| Patch | Why |
+| --- | --- |
+| `vendor/motorola/amogus` | binary patch of `libmmcamera_mot_ov16885.so`: its power-up sequence now switches the MIPI mux (GPIO 27) to the ultra-wide. The blob comes from sofiap firmware, which has no mux, so the ultra-wide failed with an SOF freeze every time |
+| `vendor/qcom/opensource/media` | camcorder profiles for camera 3, so video on the ultra-wide uses the ultra-wide instead of falling back to the main camera |
+| `device/motorola/amogus_doha` | `dohaApertureOverlay`: Aperture lists the ultra-wide as .6x and hides the depth sensor |
+
+Only in this repo:
+
+| Patch | Why |
+| --- | --- |
+| `external/prebuiltapks` | /e/ Camera's prebuilt `overrides` Aperture; dropping that installs both camera apps |
+
+Backports of fixes that LineageOS 23.2 already has:
 
 | Patch | Source | Why |
 | --- | --- | --- |
