@@ -1,0 +1,20 @@
+On /e/OS, /e/ Camera's prebuilt module lists Aperture in its overrides,
+so Aperture, which vendor/lineage's common_mobile_full.mk adds to
+PRODUCT_PACKAGES, is dropped from the build. On doha /e/ Camera (an
+Open Camera 1.55 fork) gets the preview shape wrong for the ultra-wide
+action camera (camera 3, sensor orientation 0); stock Open Camera 1.56.2
+has the same bug. Aperture handles it correctly. Drop Aperture from the
+overrides so both apps install. Camera2 and Snap stay overridden.
+
+diff --git a/Camera/Android.bp b/Camera/Android.bp
+index 2d36835..5c78847 100644
+--- a/Camera/Android.bp
++++ b/Camera/Android.bp
+@@ -4,7 +4,6 @@ android_app_import {
+     overrides: [
+         "Camera2",
+         "Snap",
+-        "Aperture",
+     ],
+     arch: {
+         arm: {
