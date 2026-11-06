@@ -174,8 +174,10 @@ dest=${ZIP_DIR:-$(dirname "$SRC")/zips}
 # Asking get_build_var for LINEAGE_VERSION here gives today's date, which
 # is wrong when the build ran past midnight UTC (doha_android#55). /e/'s
 # vendor/lineage names the zip e-<version>.zip instead of lineage-<version>.zip.
+# Every earlier dated zip is linked to it too (see above), so take the
+# newest date; the names differ only in the date (doha_android#56).
 ota=$product/lineage_$DEVICE-ota.zip
-zip=$(find "$product" -maxdepth 1 -name '*.zip' ! -name "${ota##*/}" -samefile "$ota" | head -1)
+zip=$(find "$product" -maxdepth 1 -name '*.zip' ! -name "${ota##*/}" -samefile "$ota" | sort | tail -1)
 [ -n "$zip" ] || { echo "No dated zip hard-linked to $ota" >&2; exit 1; }
 name=$(basename "$zip" .zip)
 mkdir -p "$dest"
