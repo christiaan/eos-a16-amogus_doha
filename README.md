@@ -106,9 +106,11 @@ adb sideload e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha.zip
 ```
 
 The notes in the LineageOS README apply here too. Recovery installs to
-the inactive slot, the sideload slows down at around 47% (tapping the
-screen speeds it up), and flashing `vbmeta` prints a harmless
-`anti rollback downgrade` warning.
+the inactive slot, and flashing `vbmeta` prints a harmless
+`anti rollback downgrade` warning. The sideload progress on the
+computer stops at around 47% while the phone installs the package;
+`adb` may then exit with `adb: failed to read command: Success`, which
+is harmless as well.
 
 ## Status
 
