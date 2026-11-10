@@ -1,0 +1,19 @@
+diff --git a/config/common.mk b/config/common.mk
+index 902016fa..cc29e716 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -35,9 +35,13 @@ else
+ # Enable ADB authentication
+ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=1
+ 
+-# Set ro.debuggable=0 for userdebug
++# Set ro.debuggable=0 for userdebug, unless a doha test build opts out
++# (doha_android#64): Android 16 trade-in mode limits adb to `tradeinmode`
++# commands before setup on non-debuggable builds. Keeps adb authentication.
++ifneq ($(DOHA_TEST_DEBUGGABLE),true)
+ PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG := true
+ endif
++endif
+ 
+ # Disable extra StrictMode features on all non-engineering builds
+ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.strictmode.disable=true

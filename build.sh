@@ -181,6 +181,11 @@ PRODUCT_COPY_FILES += \
     vendor/extra/adb_keys:$(TARGET_COPY_OUT_RECOVERY)/root/system/product/etc/security/adb_keys \
     vendor/extra/adb_keys:$(TARGET_COPY_OUT_PRODUCT)/etc/security/adb_keys
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.usb.config=adb
+# Keep ro.debuggable=1 (patches/vendor/lineage.patch): on a non-debuggable
+# build Android 16's trade-in mode limits adb to `tradeinmode` commands
+# until setup is done. Also allows adb root (LineageOS gates it on this).
+DOHA_TEST_DEBUGGABLE := true
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.root_access=2
 MK
 else
   # Copied files stay in out/ after their rule is gone and would end up in
