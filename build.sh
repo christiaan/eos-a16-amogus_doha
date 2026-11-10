@@ -181,13 +181,17 @@ PRODUCT_COPY_FILES += \
     vendor/extra/adb_keys:$(TARGET_COPY_OUT_RECOVERY)/root/system/product/etc/security/adb_keys \
     vendor/extra/adb_keys:$(TARGET_COPY_OUT_PRODUCT)/etc/security/adb_keys
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.usb.config=adb
-# Keep ro.debuggable=1 (patches/vendor/lineage.patch): on a non-debuggable
-# build Android 16's trade-in mode limits adb to `tradeinmode` commands
-# until setup is done. Also allows adb root (LineageOS gates it on this).
-DOHA_TEST_DEBUGGABLE := true
+# adb root; LineageOS allows it only with ro.debuggable=1, see below.
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.root_access=2
 MK
+  # Keep ro.debuggable=1 (patches/vendor/lineage.patch): on a non-debuggable
+  # build Android 16's trade-in mode limits adb to `tradeinmode` commands
+  # until setup is done. An environment variable, because inherited product
+  # makefiles such as vendor/extra/product.mk are read only after
+  # vendor/lineage/config/common.mk has checked it.
+  export DOHA_TEST_DEBUGGABLE=true
 else
+  unset DOHA_TEST_DEBUGGABLE
   # Copied files stay in out/ after their rule is gone and would end up in
   # the images, so a normal build after a test build must delete them.
   rm -f "${key_files[@]}"
@@ -212,6 +216,8 @@ if [ -z "${ADB_KEY:-}" ]; then
   for f in "${key_files[@]}"; do
     [ ! -e "$f" ] || { echo "$f exists in a build without ADB_KEY" >&2; exit 1; }
   done
+  ! grep -q '^ro.debuggable=1' "$product/system/etc/prop.default" ||
+    { echo "ro.debuggable=1 in a build without ADB_KEY" >&2; exit 1; }
 fi
 
 # bacon hard-links the dated zip to lineage_<device>-ota.zip, which the next
