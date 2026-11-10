@@ -216,7 +216,7 @@ if [ -z "${ADB_KEY:-}" ]; then
   for f in "${key_files[@]}"; do
     [ ! -e "$f" ] || { echo "$f exists in a build without ADB_KEY" >&2; exit 1; }
   done
-  ! grep -q '^ro.debuggable=1' "$product/system/etc/prop.default" ||
+  ! grep -q '^ro.debuggable=1' "$product/system/build.prop" ||
     { echo "ro.debuggable=1 in a build without ADB_KEY" >&2; exit 1; }
 fi
 
