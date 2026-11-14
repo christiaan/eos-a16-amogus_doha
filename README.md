@@ -107,7 +107,12 @@ inside `boot`.
 have to factory reset.** Seedvault backups made on our LineageOS 23.2
 can be restored on this build.
 
-1. `fastboot flash boot e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha-boot.img`.
+1. `fastboot flash boot e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha-boot.img`
+   and `fastboot flash dtbo e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha-dtbo.img`.
+   Recovery runs with the dtbo of the current slot, and with stock's,
+   the touchscreen doesn't work in recovery on phones with the Tianma
+   (FocalTech) panel. The volume keys and the power button work either
+   way.
 2. Boot into recovery, do a factory reset, then choose
    **Apply update → Apply from ADB** and run
    `adb sideload e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha.zip`.
