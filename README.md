@@ -79,6 +79,25 @@ output is named the way /e/ names it:
 
 The build is `userdebug` and signed with the AOSP test keys.
 
+### Test builds with your adb key
+
+For a test phone you can bake your own adb public key into the build, so
+adb works in recovery and in Android right after a wipe, with no
+"Allow USB debugging?" dialog:
+
+```sh
+  -v ~/.android/adbkey.pub:/adbkey.pub:ro -e ADB_KEY=/adbkey.pub \
+```
+
+Recovery and the system trust only that key (`ro.adb.secure` stays on),
+and USB debugging is on by default. Switching from a build without the key needs a
+data wipe: if `/data` was set up with USB debugging off, Android 16's
+trade-in mode takes over adb until the setup wizard is done, and only
+`adb shell tradeinmode ...` works. The output gets an `-adbkey` suffix.
+Don't share such a build: whoever holds the matching private key gets
+adb on every phone that runs it. A later build without `ADB_KEY` removes
+the key from `out/` again.
+
 ## Installing
 
 You need an unlocked bootloader. The phone is A/B, and the recovery is
@@ -88,7 +107,12 @@ inside `boot`.
 have to factory reset.** Seedvault backups made on our LineageOS 23.2
 can be restored on this build.
 
-1. `fastboot flash boot e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha-boot.img`.
+1. `fastboot flash boot e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha-boot.img`
+   and `fastboot flash dtbo e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha-dtbo.img`.
+   Recovery runs with the dtbo of the current slot, and with stock's,
+   the touchscreen doesn't work in recovery on phones with the Tianma
+   (FocalTech) panel. The volume keys and the power button work either
+   way.
 2. Boot into recovery, do a factory reset, then choose
    **Apply update → Apply from ADB** and run
    `adb sideload e-4.4.1-a16-<date>-UNOFFICIAL-amogus_doha.zip`.
@@ -129,6 +153,10 @@ Known issues:
   (`403 Not allowed`). Other unofficial /e/ builds report the same.
 - Supervised (Family Link) Google accounts don't work with microG.
 - The /e/ Updater finds no updates; new builds are posted as releases here.
+- **Wi-Fi can stay disconnected after a Wi-Fi firmware crash** when the
+  phone is a Wi-Fi client (not a hotspot). Wi-Fi shows as on but doesn't
+  connect. Turning Wi-Fi off and on fixes it. Being investigated
+  (doha_android#88).
 - The ultra-wide is mounted turned 90°, Motorola's "action cam": it
   films landscape while you hold the phone upright. /e/ Camera (like
   upstream Open Camera) sometimes gives its preview the wrong shape; the
