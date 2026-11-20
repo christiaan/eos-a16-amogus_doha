@@ -153,6 +153,10 @@ Known issues:
   (`403 Not allowed`). Other unofficial /e/ builds report the same.
 - Supervised (Family Link) Google accounts don't work with microG.
 - The /e/ Updater finds no updates; new builds are posted as releases here.
+- **Wi-Fi can stay disconnected after a Wi-Fi firmware crash** when the
+  phone is a Wi-Fi client (not a hotspot). Wi-Fi shows as on but doesn't
+  connect. Turning Wi-Fi off and on fixes it. Being investigated
+  (doha_android#88).
 - The ultra-wide is mounted turned 90°, Motorola's "action cam": it
   films landscape while you hold the phone upright. /e/ Camera (like
   upstream Open Camera) sometimes gives its preview the wrong shape; the
